@@ -29,7 +29,7 @@ import {
 } from "undici";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { homedir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { SocksDispatcher } from "./socks-dispatcher.ts";
 
 // 日志开关：默认静默（console 输出会污染 pi 的 TUI 输入框）。
@@ -107,11 +107,13 @@ interface LoadedRules {
   authRules: AuthRule[];
 }
 
+const PI_CONFIG_DIR = process.env.PI_CODING_AGENT_DIR ? resolve(process.env.PI_CODING_AGENT_DIR) : resolve(join(homedir(), ".pi", "agent"))
+
 const RULE_SOURCES = [
-  { path: join(homedir(), ".pi", "agent", "settings.json"), dedicated: false },
-  { path: join(process.cwd(), ".pi", "settings.json"), dedicated: false },
-  { path: join(homedir(), ".pi", "agent", "proxy-router.json"), dedicated: true },
-  { path: join(process.cwd(), ".pi", "proxy-router.json"), dedicated: true },
+  { path: resolve(join(PI_CONFIG_DIR, "settings.json")), dedicated: false },
+  { path: resolve(join(process.cwd(), ".pi", "settings.json")), dedicated: false },
+  { path: resolve(join(PI_CONFIG_DIR, "proxy-router.json")), dedicated: true },
+  { path: resolve(join(process.cwd(), ".pi", "proxy-router.json")), dedicated: true },
 ];
 
 let rulesCache: (LoadedRules & { mtimes: number[] }) | null = null;
